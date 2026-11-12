@@ -1,0 +1,302 @@
+[
+  {
+    "numero_factura": "2026-0001",
+    "fecha_emision": "2026-03-04",
+    "emisor_nombre": "Hermanos Hierro S.A.T.",
+    "emisor_nif": "J4108603D",
+    "cliente_nombre": "Nilo Bonet Roca",
+    "base_imponible": 3215.16,
+    "iva_porcentaje": 4.0,
+    "total": 3343.77
+  },
+  {
+    "numero_factura": "2025-0002",
+    "fecha_emision": "2025-01-22",
+    "emisor_nombre": "Fábrica AB S.A.D",
+    "emisor_nif": "D91497321",
+    "cliente_nombre": "Hortensia de Sanchez",
+    "base_imponible": 1154.89,
+    "iva_porcentaje": 21.0,
+    "total": 1397.42
+  },
+  {
+    "numero_factura": "2026-0003",
+    "fecha_emision": "2026-01-29",
+    "emisor_nombre": "Grupo Rocamora S.Com.",
+    "emisor_nif": "B04999140",
+    "cliente_nombre": "Cándido Navarro Calatayud",
+    "base_imponible": 480.35,
+    "iva_porcentaje": 10.0,
+    "total": 528.39
+  },
+  {
+    "numero_factura": "2025-0004",
+    "fecha_emision": "2025-03-03",
+    "emisor_nombre": "Minería FPL S.Coop.",
+    "emisor_nif": "W0445199C",
+    "cliente_nombre": "Ani Marcos Pardo",
+    "base_imponible": 513.79,
+    "iva_porcentaje": 4.0,
+    "total": 534.34
+  },
+  {
+    "numero_factura": "2026-0005",
+    "fecha_emision": "2026-01-21",
+    "emisor_nombre": "Banco LPEM S.A.",
+    "emisor_nif": "S3698379I",
+    "cliente_nombre": "Javi Patiño-Cánovas",
+    "base_imponible": 2828.16,
+    "iva_porcentaje": 21.0,
+    "total": 3422.07
+  },
+  {
+    "numero_factura": "2025-0006",
+    "fecha_emision": "2025-09-05",
+    "emisor_nombre": "Inmobiliaria Española S.Coop.",
+    "emisor_nif": "A26786384",
+    "cliente_nombre": "Juanito Hierro Cárdenas",
+    "base_imponible": 2273.58,
+    "iva_porcentaje": 10.0,
+    "total": 2500.94
+  },
+  {
+    "numero_factura": "2025-0007",
+    "fecha_emision": "2025-11-05",
+    "emisor_nombre": "Hotel Morata & Asociados S.A.T.",
+    "emisor_nif": "J2608513D",
+    "cliente_nombre": "Samuel Moles Quero",
+    "base_imponible": 3505.79,
+    "iva_porcentaje": 10.0,
+    "total": 3856.37
+  },
+  {
+    "numero_factura": "2025-0008",
+    "fecha_emision": "2025-06-28",
+    "emisor_nombre": "Logística Ibérica S.L.",
+    "emisor_nif": "D15560170",
+    "cliente_nombre": "Verónica Segarra Clavero",
+    "base_imponible": 1115.8,
+    "iva_porcentaje": 10.0,
+    "total": 1227.38
+  },
+  {
+    "numero_factura": "2025-0009",
+    "fecha_emision": "2025-06-26",
+    "emisor_nombre": "Infraestructuras del Noroeste S.L.N.E",
+    "emisor_nif": "Q4437923H",
+    "cliente_nombre": "Fidela Gimenez Chacón",
+    "base_imponible": 1930.64,
+    "iva_porcentaje": 10.0,
+    "total": 2123.7
+  },
+  {
+    "numero_factura": "2025-0010",
+    "fecha_emision": "2025-12-07",
+    "emisor_nombre": "Comercial HI S.L.",
+    "emisor_nif": "U8996414B",
+    "cliente_nombre": "Ana Belén Gabriela Pizarro Solé",
+    "base_imponible": 4045.28,
+    "iva_porcentaje": 21.0,
+    "total": 4894.79
+  },
+  {
+    "numero_factura": "2025-0011",
+    "fecha_emision": "2025-12-20",
+    "emisor_nombre": "Familia Lasa S.L.",
+    "emisor_nif": "C92617042",
+    "cliente_nombre": "Aurelia Marin Royo",
+    "base_imponible": 667.89,
+    "iva_porcentaje": 10.0,
+    "total": 734.68
+  },
+  {
+    "numero_factura": "2025-0012",
+    "fecha_emision": "2025-04-16",
+    "emisor_nombre": "Hermanos Valle S.L.",
+    "emisor_nif": "Q9686361H",
+    "cliente_nombre": "Zaira Camino",
+    "base_imponible": 1501.23,
+    "iva_porcentaje": 21.0,
+    "total": 1816.49
+  },
+  {
+    "numero_factura": "2026-0013",
+    "fecha_emision": "2026-08-05",
+    "emisor_nombre": "Finanzas Coronado y asociados S.L.",
+    "emisor_nif": "B38234985",
+    "cliente_nombre": "Reyes de Morante",
+    "base_imponible": 1001.83,
+    "iva_porcentaje": 4.0,
+    "total": 1041.9
+  },
+  {
+    "numero_factura": "2025-0014",
+    "fecha_emision": "2025-11-23",
+    "emisor_nombre": "Promociones MMD S.A.",
+    "emisor_nif": "H16945222",
+    "cliente_nombre": "Sabina Bayón Casas",
+    "base_imponible": 3876.69,
+    "iva_porcentaje": 4.0,
+    "total": 4031.76
+  },
+  {
+    "numero_factura": "2025-0015",
+    "fecha_emision": "2025-03-27",
+    "emisor_nombre": "Carmela Dalmau Landa S.Coop.",
+    "emisor_nif": "Q2728882H",
+    "cliente_nombre": "Ileana Cloe Font Mesa",
+    "base_imponible": 1931.62,
+    "iva_porcentaje": 10.0,
+    "total": 2124.78
+  },
+  {
+    "numero_factura": "2025-0016",
+    "fecha_emision": "2025-09-24",
+    "emisor_nombre": "Ríos y asociados S.A.",
+    "emisor_nif": "J1197935H",
+    "cliente_nombre": "Amílcar del Almazán",
+    "base_imponible": 1882.4,
+    "iva_porcentaje": 4.0,
+    "total": 1957.7
+  },
+  {
+    "numero_factura": "2026-0017",
+    "fecha_emision": "2026-01-28",
+    "emisor_nombre": "Hotel Avanzadas S.A.",
+    "emisor_nif": "H27414382",
+    "cliente_nombre": "Darío Bauzà Angulo",
+    "base_imponible": 3065.2,
+    "iva_porcentaje": 4.0,
+    "total": 3187.81
+  },
+  {
+    "numero_factura": "2026-0018",
+    "fecha_emision": "2026-07-29",
+    "emisor_nombre": "Industrias ILG S.L.N.E",
+    "emisor_nif": "H54405618",
+    "cliente_nombre": "Maricruz Suárez-Herrero",
+    "base_imponible": 2338.19,
+    "iva_porcentaje": 10.0,
+    "total": 2572.01
+  },
+  {
+    "numero_factura": "2026-0019",
+    "fecha_emision": "2026-06-09",
+    "emisor_nombre": "Falcón y Busquets S.A.",
+    "emisor_nif": "H05385521",
+    "cliente_nombre": "Felicidad Roda Reig",
+    "base_imponible": 4222.12,
+    "iva_porcentaje": 4.0,
+    "total": 4391.0
+  },
+  {
+    "numero_factura": "2025-0020",
+    "fecha_emision": "2025-11-08",
+    "emisor_nombre": "Familia Barrera S.Com.",
+    "emisor_nif": "J1110460A",
+    "cliente_nombre": "Rosalía Canales Ibarra",
+    "base_imponible": 4034.98,
+    "iva_porcentaje": 10.0,
+    "total": 4438.48
+  },
+  {
+    "numero_factura": "2025-0021",
+    "fecha_emision": "2025-05-08",
+    "emisor_nombre": "Enrique Roca Español S.C.P",
+    "emisor_nif": "P3567281E",
+    "cliente_nombre": "Ulises de Salazar",
+    "base_imponible": 1094.37,
+    "iva_porcentaje": 21.0,
+    "total": 1324.19
+  },
+  {
+    "numero_factura": "2026-0022",
+    "fecha_emision": "2026-06-24",
+    "emisor_nombre": "Comercial ZRYW S.L.L.",
+    "emisor_nif": "U2396987F",
+    "cliente_nombre": "Herminio Torralba Teruel",
+    "base_imponible": 3294.42,
+    "iva_porcentaje": 10.0,
+    "total": 3623.86
+  },
+  {
+    "numero_factura": "2025-0023",
+    "fecha_emision": "2025-05-23",
+    "emisor_nombre": "Barral y Cózar S.Com.",
+    "emisor_nif": "J9807725H",
+    "cliente_nombre": "Dulce Sanz Machado",
+    "base_imponible": 1361.16,
+    "iva_porcentaje": 4.0,
+    "total": 1415.61
+  },
+  {
+    "numero_factura": "2025-0024",
+    "fecha_emision": "2025-10-10",
+    "emisor_nombre": "Fabián Falcó Martin S.A.T.",
+    "emisor_nif": "R6073292B",
+    "cliente_nombre": "Luis Miguel Barrera Mir",
+    "base_imponible": 2170.75,
+    "iva_porcentaje": 21.0,
+    "total": 2626.61
+  },
+  {
+    "numero_factura": "2025-0025",
+    "fecha_emision": "2025-02-08",
+    "emisor_nombre": "Ani Criado Barberá S.L.N.E",
+    "emisor_nif": "W8279821F",
+    "cliente_nombre": "Teodoro Estevez Bayona",
+    "base_imponible": 1135.64,
+    "iva_porcentaje": 4.0,
+    "total": 1181.07
+  },
+  {
+    "numero_factura": "2026-0026",
+    "fecha_emision": "2026-02-02",
+    "emisor_nombre": "Servicios Españolas S.L.N.E",
+    "emisor_nif": "D25642513",
+    "cliente_nombre": "Delia Ariño-Bilbao",
+    "base_imponible": 500.0,
+    "iva_porcentaje": 4.0,
+    "total": 520.0
+  },
+  {
+    "numero_factura": "2025-0027",
+    "fecha_emision": "2025-10-08",
+    "emisor_nombre": "Julián & Asociados S.L.",
+    "emisor_nif": "S1065818E",
+    "cliente_nombre": "Dafne Lara Priego",
+    "base_imponible": 3155.86,
+    "iva_porcentaje": 21.0,
+    "total": 3818.59
+  },
+  {
+    "numero_factura": "2025-0028",
+    "fecha_emision": "2025-03-29",
+    "emisor_nombre": "Talleres Molina & Asociados S.A.",
+    "emisor_nif": "U8877065F",
+    "cliente_nombre": "Marcela Armida Beltrán Garcés",
+    "base_imponible": 1954.6,
+    "iva_porcentaje": 21.0,
+    "total": 2365.07
+  },
+  {
+    "numero_factura": "2025-0029",
+    "fecha_emision": "2025-12-04",
+    "emisor_nombre": "Minería Bayona S.L.N.E",
+    "emisor_nif": "A19218593",
+    "cliente_nombre": "Elodia Cruz Ríos",
+    "base_imponible": 1294.5,
+    "iva_porcentaje": 21.0,
+    "total": 1566.35
+  },
+  {
+    "numero_factura": "2026-0030",
+    "fecha_emision": "2026-07-11",
+    "emisor_nombre": "Alimentación Marí & Asociados S.L.N.E",
+    "emisor_nif": "J5707197I",
+    "cliente_nombre": "Eligio Carlos Campo",
+    "base_imponible": 3424.47,
+    "iva_porcentaje": 21.0,
+    "total": 4143.61
+  }
+]
