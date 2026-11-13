@@ -9,19 +9,30 @@ from modelos import Factura
 load_dotenv()
 client = anthropic.Anthropic()
 
-INSTRUCCIONES = """Extrae los datos de la factura que te paso.
-Reglas:
-- Usa solo lo que aparezca en el texto. Si un dato no aparece, devuelve null. No inventes nada.
-- Las fechas, en formato AAAA-MM-DD.
-- Los importes, como números con punto decimal, sin moneda ni separador de miles (3.215,16 EUR pasa a 3215.16).
-- iva_porcentaje es el porcentaje como número (21, no 0.21).
-- El emisor es quien emite la factura; el cliente es quien la recibe."""
+INSTRUCCIONES = INSTRUCCIONES = """Extrae los datos de la factura que te paso.
+
+Reglas generales:
+- Usa solo lo que aparezca en el texto. Si un dato no aparece, devuelve null (o una lista vacía en desglose_iva). No inventes nada.
+- Fechas en formato AAAA-MM-DD, sin la hora.
+- Importes como números con punto decimal, sin moneda ni separador de miles (3.215,16 EUR pasa a 3215.16). Un signo menos detrás de la cifra (1,98-) significa importe negativo.
+- Los porcentajes, como número (21, no 0.21).
+
+Qué dato elegir cuando hay varios candidatos:
+- numero_factura: el que acompaña a la palabra "Factura", copiado tal como aparece. Ignora números de ticket, pedido, cliente, tarjeta u otros códigos.
+- fecha_emision: la fecha de emisión o de venta. Ignora fechas de impresión o de entrega.
+- emisor_nombre: la razón social de quien emite la factura (S.A., S.L., S.L.U., etc.), no el nombre comercial de la tienda ni de la sucursal.
+- emisor_nif: el NIF o CIF que aparece junto a los datos del emisor.
+- cliente_nombre y cliente_nif: los del destinatario de la factura. El NIF del cliente es el que está junto a sus datos; no lo confundas con un número de cliente.
+- base_imponible: el total antes de impuestos (suma de todas las bases).
+- iva_total: el importe total del IVA (suma de todas las cuotas).
+- total: el importe total a pagar, con impuestos incluidos.
+- desglose_iva: una entrada por cada tipo de IVA con su base, su porcentaje y su cuota. Si solo hay un tipo, una sola entrada."""
 
 
 def extraer_factura(texto: str) -> tuple:
     respuesta = client.messages.create(
         model="claude-haiku-5-5",
-        max_tokens=500,
+        max_tokens=1000,
         system=INSTRUCCIONES,
         tools=[
             {
