@@ -12,7 +12,7 @@ Faker.seed(7)
 random.seed(7)
 
 MESES = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio",
-         "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"]
+        "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"]
 CODIGO_IVA = {10: 1, 21: 2, 4: 5}
 PRODUCTOS = [
     "ARROZ REDONDO 1KG", "ACEITE GIRASOL 5L", "PASTA ESPIRAL 500G", "CAFE MOLIDO 250G",
