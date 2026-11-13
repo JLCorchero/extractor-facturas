@@ -1,4 +1,30 @@
 from modelos import Factura
+import re
+
+LETRAS_DNI = "TRWAGMYFPDXBNJZSQVHLCKE"
+LETRAS_CIF = "JABCDEFGHI"
+
+
+def nif_valido(nif: str) -> bool:
+    """Comprueba la letra o dígito de control de un DNI, NIE o CIF español."""
+    if re.fullmatch(r"\d{8}[A-Z]", nif):
+        return LETRAS_DNI[int(nif[:8]) % 23] == nif[8]
+    if re.fullmatch(r"[XYZ]\d{7}[A-Z]", nif):
+        numero = "XYZ".index(nif[0]) * 10**7 + int(nif[1:8])
+        return LETRAS_DNI[numero % 23] == nif[8]
+    if re.fullmatch(r"[ABCDEFGHJNPQRSUVW]\d{7}[0-9A-J]", nif):
+        digitos = [int(d) for d in nif[1:8]]
+        pares = sum(digitos[1::2])
+        impares = sum(sum(divmod(2 * d, 10)) for d in digitos[0::2])
+        control = (10 - (pares + impares) % 10) % 10
+        if nif[0] in "PQRSNW":
+            return nif[8] == LETRAS_CIF[control]
+        if nif[0] in "ABEH":
+            return nif[8] == str(control)
+        return nif[8] in (str(control), LETRAS_CIF[control])
+    return False
+
+
 
 TOLERANCIA = 0.02
 
@@ -28,10 +54,18 @@ def comprobar_coherencia(f: Factura) -> list[str]:
                         f"{esperada:.2f}, pero es {linea.cuota:.2f}"
                     )
 
-    if None not in (f.base_imponible, f.iva_total, f.total):
-        if abs(f.base_imponible + f.iva_total - f.total) > TOLERANCIA:
-            avisos.append(
-                f"base + IVA es {f.base_imponible + f.iva_total:.2f}, pero total es {f.total:.2f}"
-            )
+        if None not in (f.base_imponible, f.iva_total, f.total):
+            if abs(f.base_imponible + f.iva_total - f.total) > TOLERANCIA:
+                avisos.append(
+                    f"base + IVA es {f.base_imponible + f.iva_total:.2f}, pero total es {f.total:.2f}"
+                )
+
+    for campo in ("numero_factura", "fecha_emision", "total", "emisor_nif"):
+        if getattr(f, campo) is None:
+            avisos.append(f"Falta el campo obligatorio {campo}")
+    for campo in ("emisor_nif", "cliente_nif"):
+        valor = getattr(f, campo)
+        if valor is not None and not nif_valido(valor):
+            avisos.append(f"{campo} '{valor}' no tiene un formato o dígito de control válido")
 
     return avisos

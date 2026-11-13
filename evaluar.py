@@ -1,81 +1,153 @@
+import hashlib
 import json
 import sys
 import time
+import unicodedata
+from collections import defaultdict
 from pathlib import Path
 
-from extraer_factura import extraer_factura
+from extraer_factura import INSTRUCCIONES, MODELO, extraer_factura
 from extraer_texto import extraer_texto
 from modelos import Factura
+from validacion import comprobar_coherencia
 
 CAMPOS = list(Factura.model_fields)
+CAMPOS_NOMBRE = {"emisor_nombre", "cliente_nombre"}
 PREDICCIONES = Path("datos/predicciones.json")
+HUELLA = hashlib.sha256(
+    (MODELO + INSTRUCCIONES + json.dumps(Factura.model_json_schema(), sort_keys=True)).encode()
+).hexdigest()[:12]
 
-def coincide(esperado, obtenido) -> bool:
-    if isinstance(esperado, float) and isinstance(obtenido, float):
+
+def sin_acentos(texto: str) -> str:
+    return "".join(c for c in unicodedata.normalize("NFKD", texto) if not unicodedata.combining(c))
+
+
+def normalizar(texto: str) -> str:
+    return " ".join(sin_acentos(texto).casefold().split())
+
+
+def coincide(campo, esperado, obtenido) -> bool:
+    if esperado is None or obtenido is None:
+        return esperado is None and obtenido is None
+    if isinstance(esperado, float):
         return abs(esperado - obtenido) < 0.01
+    if campo in CAMPOS_NOMBRE:
+        return normalizar(esperado) == normalizar(obtenido)
     return esperado == obtenido
 
 
+def desglose_igual(esperado, obtenido) -> bool:
+    if len(esperado) != len(obtenido):
+        return False
+    a = sorted(esperado, key=lambda linea: linea.porcentaje or 0)
+    b = sorted(obtenido, key=lambda linea: linea.porcentaje or 0)
+    return all(
+        coincide("num", x.porcentaje, y.porcentaje)
+        and coincide("num", x.base, y.base)
+        and coincide("num", x.cuota, y.cuota)
+        for x, y in zip(a, b)
+    )
+
+
+def cargar_cache() -> dict:
+    if PREDICCIONES.exists():
+        contenido = json.loads(PREDICCIONES.read_text(encoding="utf-8"))
+        if contenido.get("huella") == HUELLA:
+            return contenido["resultados"]
+    return {}
+
+
+def guardar_cache(resultados: dict) -> None:
+    PREDICCIONES.write_text(
+        json.dumps({"huella": HUELLA, "resultados": resultados}, ensure_ascii=False, indent=2),
+        encoding="utf-8",
+    )
+
+
 if __name__ == "__main__":
-    limite = int(sys.argv[1]) if len(sys.argv) > 1 else 30
+    rapido = len(sys.argv) > 1 and sys.argv[1] == "rapido"
 
     with open("datos/respuestas.json", encoding="utf-8") as archivo:
-        respuestas = json.load(archivo)[:limite]
+        registros = json.load(archivo)
 
-    cache = {}
-    if PREDICCIONES.exists():
-        cache = json.loads(PREDICCIONES.read_text(encoding="utf-8"))
-    
-    aciertos = {campo: 0 for campo in CAMPOS}
-    perfectas = 0
+    if rapido:
+        vistos = defaultdict(int)
+        seleccion = []
+        for r in registros:
+            if vistos[r["formato"]] < 2:
+                vistos[r["formato"]] += 1
+                seleccion.append(r)
+        registros = seleccion
+
+    resultados = cargar_cache()
+    stats = {}
     tokens_in = tokens_out = 0
     segundos = []
 
-    for i, datos in enumerate(respuestas, start=1):
-        nombre = f"factura_{i:02d}.pdf"
-        esperado = Factura.model_validate(datos)
+    for r in registros:
+        nombre, formato = r["archivo"], r["formato"]
+        esperado = Factura.model_validate(r["datos"])
+        s = stats.setdefault(
+            formato,
+            {"n": 0, "aciertos": {c: 0 for c in CAMPOS}, "perfectas": 0, "con_error": 0, "detectadas": 0},
+        )
+        s["n"] += 1
 
         try:
-            if nombre not in cache:
+            if nombre not in resultados:
                 inicio = time.time()
                 texto = extraer_texto(f"facturas/{nombre}")
                 obtenido, uso = extraer_factura(texto)
-                cache[nombre] = {
+                resultados[nombre] = {
                     "datos": obtenido.model_dump(mode="json"),
                     "in": uso.input_tokens,
                     "out": uso.output_tokens,
                     "seg": round(time.time() - inicio, 2),
                 }
-                PREDICCIONES.write_text(
-                    json.dumps(cache, ensure_ascii=False, indent=2), encoding="utf-8"
-                )
-            obtenido = Factura.model_validate(cache[nombre]["datos"])
+                guardar_cache(resultados)
+            obtenido = Factura.model_validate(resultados[nombre]["datos"])
         except Exception as error:
             print(f"{nombre}: ERROR {error}")
+            s["con_error"] += 1
             continue
 
-        tokens_in += cache[nombre]["in"]
-        tokens_out += cache[nombre]["out"]
-        segundos.append(cache[nombre]["seg"])
+        tokens_in += resultados[nombre]["in"]
+        tokens_out += resultados[nombre]["out"]
+        segundos.append(resultados[nombre]["seg"])
 
-        correctos = 0
+        fallos = []
         for campo in CAMPOS:
-            valor_esperado = getattr(esperado, campo)
-            valor_obtenido = getattr(obtenido, campo)
-            if coincide(valor_esperado, valor_obtenido):
-                aciertos[campo] += 1
-                correctos += 1
+            v_esp, v_obt = getattr(esperado, campo), getattr(obtenido, campo)
+            if campo == "desglose_iva":
+                ok = desglose_igual(v_esp, v_obt)
             else:
-                print(f"{nombre} · {campo}: esperado {valor_esperado!r}, obtenido {valor_obtenido!r}")
-        if correctos == len(CAMPOS):
-            perfectas += 1
+                ok = coincide(campo, v_esp, v_obt)
+            if ok:
+                s["aciertos"][campo] += 1
+            else:
+                fallos.append(campo)
+                print(f"{nombre} · {campo}: esperado {v_esp!r}, obtenido {v_obt!r}")
 
-    total = len(respuestas)
-    print("\nPrecisión por campo:")
-    for campo, n in aciertos.items():
-        print(f"  {campo:16} {n}/{total}  {100 * n / total:.0f}%")
-    print(f"\nFacturas con los 8 campos correctos: {perfectas}/{total}")
+        if not fallos:
+            s["perfectas"] += 1
+        else:
+            s["con_error"] += 1
+            if comprobar_coherencia(obtenido):
+                s["detectadas"] += 1
+
+    for formato in sorted(stats):
+        s = stats[formato]
+        print(f"\nFormato {formato} ({s['n']} facturas)")
+        for campo in CAMPOS:
+            n = s["aciertos"][campo]
+            print(f"  {campo:16} {n}/{s['n']}  {100 * n / s['n']:.0f}%")
+        print(f"  Facturas perfectas: {s['perfectas']}/{s['n']}")
+        if s["con_error"]:
+            print(f"  Con algún error: {s['con_error']} · avisadas por la validación: {s['detectadas']}")
+
+    total = sum(s["n"] for s in stats.values())
     coste = tokens_in * 0.10 / 1_000_000 + tokens_out * 0.50 / 1_000_000
-    print(f"Coste total: {coste:.5f} $  ·  por factura: {coste / total:.5f} $")
+    print(f"\nCoste total: {coste:.5f} $  ·  por factura: {coste / total:.5f} $")
     if segundos:
         print(f"Tiempo medio por factura: {sum(segundos) / len(segundos):.1f} s")

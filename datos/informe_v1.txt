@@ -1,0 +1,44 @@
+factura_19_B.pdf · cliente_nif: esperado 'A18768283', obtenido None
+
+Formato A (12 facturas)
+  numero_factura   12/12  100%
+  fecha_emision    12/12  100%
+  emisor_nombre    12/12  100%
+  emisor_nif       12/12  100%
+  cliente_nombre   12/12  100%
+  cliente_nif      12/12  100%
+  base_imponible   12/12  100%
+  iva_total        12/12  100%
+  total            12/12  100%
+  desglose_iva     12/12  100%
+  Facturas perfectas: 12/12
+
+Formato B (12 facturas)
+  numero_factura   12/12  100%
+  fecha_emision    12/12  100%
+  emisor_nombre    12/12  100%
+  emisor_nif       12/12  100%
+  cliente_nombre   12/12  100%
+  cliente_nif      11/12  92%
+  base_imponible   12/12  100%
+  iva_total        12/12  100%
+  total            12/12  100%
+  desglose_iva     12/12  100%
+  Facturas perfectas: 11/12
+  Con algún error: 1 · avisadas por la validación: 0
+
+Formato C (12 facturas)
+  numero_factura   12/12  100%
+  fecha_emision    12/12  100%
+  emisor_nombre    12/12  100%
+  emisor_nif       12/12  100%
+  cliente_nombre   12/12  100%
+  cliente_nif      12/12  100%
+  base_imponible   12/12  100%
+  iva_total        12/12  100%
+  total            12/12  100%
+  desglose_iva     12/12  100%
+  Facturas perfectas: 12/12
+
+Coste total: 0.01528 $  ·  por factura: 0.00042 $
+Tiempo medio por factura: 1.8 s
