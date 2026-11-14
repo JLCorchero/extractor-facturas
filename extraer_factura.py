@@ -2,7 +2,9 @@ import sys
 
 import anthropic
 from dotenv import load_dotenv
+from pydantic import ValidationError
 
+from errores import ErrorExtraccion
 from extraer_texto import extraer_texto
 from modelos import Factura
 
@@ -40,23 +42,39 @@ def obtener_cliente():
 
 def extraer_factura(texto: str, cliente=None) -> tuple:
     cliente = cliente or obtener_cliente()
-    respuesta = cliente.messages.create(
-        model=MODELO,
-        max_tokens=1000,
-        system=INSTRUCCIONES,
-        tools=[
-            {
-                "name": "registrar_factura",
-                "description": "Registra los datos extraídos de una factura",
-                "input_schema": Factura.model_json_schema(),
-            }
-        ],
-        tool_choice={"type": "tool", "name": "registrar_factura"},
-        messages=[{"role": "user", "content": f"Texto de la factura\n\n{texto}"}],
-    )
-    bloque = next(b for b in respuesta.content if b.type == "tool_use")
-    return Factura.model_validate(bloque.input), respuesta.usage
+    try:
+        respuesta = cliente.messages.create(
+            model=MODELO,
+            max_tokens=1000,
+            system=INSTRUCCIONES,
+            tools=[
+                {
+                    "name": "registrar_factura",
+                    "description": "Registra los datos extraídos de una factura",
+                    "input_schema": Factura.model_json_schema(),
+                }
+            ],
+            tool_choice={"type": "tool", "name": "registrar_factura"},
+            messages=[{"role": "user", "content": f"Texto de la factura\n\n{texto}"}],
+        )
+    except anthropic.APIConnectionError as error:
+        raise ErrorExtraccion(
+            "servicio_no_disponible", "No se ha podido conectar con el servicio de IA. Inténtalo de nuevo en un momento."
+        ) from error
+    except anthropic.APIStatusError as error:
+        raise ErrorExtraccion(
+            "servicio_no_disponible", "El servicio de IA ha devuelto un error. Inténtalo de nuevo en un momento."
+        ) from error
 
+    if respuesta.stop_reason == "max_tokens":
+        raise ErrorExtraccion("respuesta_cortada", "La respuesta de la IA se ha cortado antes de terminar.")
+    bloque = next((b for b in respuesta.content if b.type == "tool_use"), None)
+    if bloque is None:
+        raise ErrorExtraccion("sin_respuesta", "La IA no ha devuelto los datos de la factura.")
+    try:
+        return Factura.model_validate(bloque.input), respuesta.usage
+    except ValidationError as error:
+        raise ErrorExtraccion("datos_invalidos", "La IA ha devuelto datos que no tienen el formato esperado.") from error
 
 if __name__ == "__main__":
     texto = extraer_texto(sys.argv[1])

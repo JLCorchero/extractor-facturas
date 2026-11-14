@@ -3,9 +3,11 @@ import secrets
 from io import BytesIO
 
 from dotenv import load_dotenv
-from fastapi import Depends, FastAPI, HTTPException, Security, UploadFile
+from fastapi import Depends, FastAPI, HTTPException, Request, Security, UploadFile
+from fastapi.responses import JSONResponse
 from fastapi.security import APIKeyHeader
 
+from errores import ErrorExtraccion
 from extraer_factura import extraer_factura
 from extraer_texto import extraer_texto
 from validacion import comprobar_coherencia
@@ -28,6 +30,22 @@ def comprobar_clave(clave: str | None = Security(cabecera_clave)):
 
 app = FastAPI(title="Extractor de facturas")
 
+ESTADO_HTTP = {
+    "pdf_ilegible": 422,
+    "pdf_protegido": 422,
+    "sin_texto": 422,
+    "respuesta_cortada": 502,
+    "sin_respuesta": 502,
+    "datos_invalidos": 502,
+    "servicio_no_disponible": 503,
+}
+
+
+@app.exception_handler(ErrorExtraccion)
+async def error_de_extraccion(peticion: Request, error: ErrorExtraccion):
+    estado = ESTADO_HTTP.get(error.codigo, 500)
+    return JSONResponse(status_code=estado, content={"detail": error.mensaje, "codigo": error.codigo})
+
 
 @app.post("/extraer", dependencies=[Depends(comprobar_clave)])
 def extraer(archivo: UploadFile):
@@ -39,8 +57,6 @@ def extraer(archivo: UploadFile):
         raise HTTPException(status_code=413, detail="El PDF supera los 5 MB")
 
     texto = extraer_texto(BytesIO(contenido))
-    if not texto.strip():
-        raise HTTPException(status_code=422, detail="El PDF no tiene texto (¿está escaneado?)")
     if len(texto) > MAX_CARACTERES:
         raise HTTPException(status_code=422, detail="El documento es demasiado largo")
 
@@ -52,3 +68,9 @@ def extraer(archivo: UploadFile):
         "revisar": bool(avisos),
         "tokens": {"entrada": uso.input_tokens, "salida": uso.output_tokens},
     }
+
+
+
+@app.get("/salud")
+def salud():
+    return {"estado": "ok"}
