@@ -10,7 +10,7 @@ load_dotenv()
 client = anthropic.Anthropic()
 MODELO = "claude-haiku-5-5"
 
-INSTRUCCIONES = INSTRUCCIONES = """Extrae los datos de la factura que te paso.
+INSTRUCCIONES = """Extrae los datos de la factura que te paso.
 
 Reglas generales:
 - Usa solo lo que aparezca en el texto. Si un dato no aparece, devuelve null (o una lista vacía en desglose_iva). No inventes nada.
@@ -23,9 +23,9 @@ Qué dato elegir cuando hay varios candidatos:
 - fecha_emision: la fecha de emisión o de venta. Ignora fechas de impresión o de entrega.
 - emisor_nombre: la razón social de quien emite la factura (S.A., S.L., S.L.U., etc.), no el nombre comercial de la tienda ni de la sucursal.
 - emisor_nif: el NIF o CIF que aparece junto a los datos del emisor.
-- cliente_nombre y cliente_nif: los del destinatario de la factura. El NIF del cliente es el que está junto a sus datos; no lo confundas con un número de cliente,En tickets de tienda, un campo suelto "Numero NIF" o "N. NIF" separado de los bloques de dirección, cuando el emisor ya tiene su propio CIF identificado, es el NIF del cliente.
-- base_imponible: el total antes de impuestos (suma de todas las bases).
-- iva_total: el importe total del IVA (suma de todas las cuotas).
+- cliente_nombre y cliente_nif: los del destinatario de la factura. El NIF del cliente es el que está junto a sus datos; no lo confundas con un número de cliente, de pedido o de tarjeta. En tickets de tienda, un campo suelto "Numero NIF" o "N. NIF", separado de los bloques de dirección, cuando el emisor ya tiene su propio CIF identificado, es el NIF del cliente.
+- base_imponible: el total antes de impuestos, es decir, la suma de todas las bases del desglose de IVA. Suele aparecer en la fila de totales bajo la columna de bases, a veces sin etiqueta. No es la base de una sola línea de IVA cuando hay varios tipos.
+- iva_total: el importe total del IVA, es decir, la suma de todas las cuotas. Suele estar en la misma fila de totales, bajo la columna de cuotas.
 - total: el importe total a pagar, con impuestos incluidos.
 - desglose_iva: una entrada por cada tipo de IVA con su base, su porcentaje y su cuota. Si solo hay un tipo, una sola entrada."""
 

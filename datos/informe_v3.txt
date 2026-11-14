@@ -1,0 +1,42 @@
+
+Formato A (12 facturas x 3 pasadas = 36 ejecuciones)
+  numero_factura   36/36  100%
+  fecha_emision    36/36  100%
+  emisor_nombre    36/36  100%
+  emisor_nif       36/36  100%
+  cliente_nombre   36/36  100%
+  cliente_nif      36/36  100%
+  base_imponible   36/36  100%
+  iva_total        36/36  100%
+  total            36/36  100%
+  desglose_iva     36/36  100%
+  Ejecuciones perfectas: 36/36
+
+Formato B (12 facturas x 3 pasadas = 36 ejecuciones)
+  numero_factura   36/36  100%
+  fecha_emision    36/36  100%
+  emisor_nombre    36/36  100%
+  emisor_nif       36/36  100%
+  cliente_nombre   36/36  100%
+  cliente_nif      36/36  100%
+  base_imponible   36/36  100%
+  iva_total        36/36  100%
+  total            36/36  100%
+  desglose_iva     36/36  100%
+  Ejecuciones perfectas: 36/36
+
+Formato C (12 facturas x 3 pasadas = 36 ejecuciones)
+  numero_factura   36/36  100%
+  fecha_emision    36/36  100%
+  emisor_nombre    36/36  100%
+  emisor_nif       36/36  100%
+  cliente_nombre   36/36  100%
+  cliente_nif      36/36  100%
+  base_imponible   36/36  100%
+  iva_total        36/36  100%
+  total            36/36  100%
+  desglose_iva     36/36  100%
+  Ejecuciones perfectas: 36/36
+
+Coste total: 0.04791 $  ·  por ejecución: 0.00044 $
+Tiempo medio por ejecución: 1.9 s

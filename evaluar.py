@@ -54,7 +54,10 @@ def cargar_cache() -> dict:
     if PREDICCIONES.exists():
         contenido = json.loads(PREDICCIONES.read_text(encoding="utf-8"))
         if contenido.get("huella") == HUELLA:
-            return contenido["resultados"]
+            return {
+                nombre: (valor if isinstance(valor, list) else [valor])
+                for nombre, valor in contenido["resultados"].items()
+            }
     return {}
 
 
@@ -66,7 +69,10 @@ def guardar_cache(resultados: dict) -> None:
 
 
 if __name__ == "__main__":
-    rapido = len(sys.argv) > 1 and sys.argv[1] == "rapido"
+    argumentos = sys.argv[1:]
+    rapido = "rapido" in argumentos
+    numeros = [a for a in argumentos if a.isdigit()]
+    repeticiones = int(numeros[0]) if numeros else 1
 
     with open("datos/respuestas.json", encoding="utf-8") as archivo:
         registros = json.load(archivo)
@@ -90,64 +96,99 @@ if __name__ == "__main__":
         esperado = Factura.model_validate(r["datos"])
         s = stats.setdefault(
             formato,
-            {"n": 0, "aciertos": {c: 0 for c in CAMPOS}, "perfectas": 0, "con_error": 0, "detectadas": 0},
+            {
+                "facturas": 0,
+                "n": 0,
+                "aciertos": {c: 0 for c in CAMPOS},
+                "perfectas": 0,
+                "con_error": 0,
+                "detectadas": 0,
+                "intermitentes": [],
+                "siempre_fallan": [],
+            },
         )
-        s["n"] += 1
+        s["facturas"] += 1
 
-        try:
-            if nombre not in resultados:
+        corridas = resultados.setdefault(nombre, [])
+        texto = None
+        while len(corridas) < repeticiones:
+            try:
+                if texto is None:
+                    texto = extraer_texto(f"facturas/{nombre}")
                 inicio = time.time()
-                texto = extraer_texto(f"facturas/{nombre}")
                 obtenido, uso = extraer_factura(texto)
-                resultados[nombre] = {
-                    "datos": obtenido.model_dump(mode="json"),
-                    "in": uso.input_tokens,
-                    "out": uso.output_tokens,
-                    "seg": round(time.time() - inicio, 2),
-                }
+                corridas.append(
+                    {
+                        "datos": obtenido.model_dump(mode="json"),
+                        "in": uso.input_tokens,
+                        "out": uso.output_tokens,
+                        "seg": round(time.time() - inicio, 2),
+                    }
+                )
                 guardar_cache(resultados)
-            obtenido = Factura.model_validate(resultados[nombre]["datos"])
-        except Exception as error:
-            print(f"{nombre}: ERROR {error}")
-            s["con_error"] += 1
-            continue
+            except Exception as error:
+                print(f"{nombre}: ERROR {error}")
+                break
 
-        tokens_in += resultados[nombre]["in"]
-        tokens_out += resultados[nombre]["out"]
-        segundos.append(resultados[nombre]["seg"])
+        usadas = corridas[:repeticiones]
+        veredictos = []
+        for k, corrida in enumerate(usadas, start=1):
+            obtenido = Factura.model_validate(corrida["datos"])
+            tokens_in += corrida["in"]
+            tokens_out += corrida["out"]
+            segundos.append(corrida["seg"])
 
-        fallos = []
-        for campo in CAMPOS:
-            v_esp, v_obt = getattr(esperado, campo), getattr(obtenido, campo)
-            if campo == "desglose_iva":
-                ok = desglose_igual(v_esp, v_obt)
+            fallos = []
+            for campo in CAMPOS:
+                v_esp, v_obt = getattr(esperado, campo), getattr(obtenido, campo)
+                if campo == "desglose_iva":
+                    ok = desglose_igual(v_esp, v_obt)
+                else:
+                    ok = coincide(campo, v_esp, v_obt)
+                if ok:
+                    s["aciertos"][campo] += 1
+                else:
+                    fallos.append(campo)
+                    print(f"{nombre} (pasada {k}) · {campo}: esperado {v_esp!r}, obtenido {v_obt!r}")
+
+            s["n"] += 1
+            if not fallos:
+                s["perfectas"] += 1
             else:
-                ok = coincide(campo, v_esp, v_obt)
-            if ok:
-                s["aciertos"][campo] += 1
-            else:
-                fallos.append(campo)
-                print(f"{nombre} · {campo}: esperado {v_esp!r}, obtenido {v_obt!r}")
+                s["con_error"] += 1
+                if comprobar_coherencia(obtenido):
+                    s["detectadas"] += 1
+            veredictos.append(not fallos)
 
-        if not fallos:
-            s["perfectas"] += 1
+        # Pasadas que no se pudieron ejecutar (error de la API, etc.): cuentan como fallo.
+        faltan = repeticiones - len(usadas)
+        s["n"] += faltan
+        s["con_error"] += faltan
+        veredictos += [False] * faltan
+
+        if all(veredictos):
+            pass
+        elif any(veredictos):
+            s["intermitentes"].append(nombre)
         else:
-            s["con_error"] += 1
-            if comprobar_coherencia(obtenido):
-                s["detectadas"] += 1
+            s["siempre_fallan"].append(nombre)
 
     for formato in sorted(stats):
         s = stats[formato]
-        print(f"\nFormato {formato} ({s['n']} facturas)")
+        print(f"\nFormato {formato} ({s['facturas']} facturas x {repeticiones} pasadas = {s['n']} ejecuciones)")
         for campo in CAMPOS:
             n = s["aciertos"][campo]
             print(f"  {campo:16} {n}/{s['n']}  {100 * n / s['n']:.0f}%")
-        print(f"  Facturas perfectas: {s['perfectas']}/{s['n']}")
+        print(f"  Ejecuciones perfectas: {s['perfectas']}/{s['n']}")
         if s["con_error"]:
             print(f"  Con algún error: {s['con_error']} · avisadas por la validación: {s['detectadas']}")
+        if s["intermitentes"]:
+            print(f"  Intermitentes (a veces bien, a veces mal): {', '.join(s['intermitentes'])}")
+        if s["siempre_fallan"]:
+            print(f"  Fallan siempre: {', '.join(s['siempre_fallan'])}")
 
-    total = sum(s["n"] for s in stats.values())
+    ejecuciones = sum(s["n"] for s in stats.values())
     coste = tokens_in * 0.10 / 1_000_000 + tokens_out * 0.50 / 1_000_000
-    print(f"\nCoste total: {coste:.5f} $  ·  por factura: {coste / total:.5f} $")
+    print(f"\nCoste total: {coste:.5f} $  ·  por ejecución: {coste / ejecuciones:.5f} $")
     if segundos:
-        print(f"Tiempo medio por factura: {sum(segundos) / len(segundos):.1f} s")
+        print(f"Tiempo medio por ejecución: {sum(segundos) / len(segundos):.1f} s")

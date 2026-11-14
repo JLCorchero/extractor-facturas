@@ -2,8 +2,11 @@ import os
 
 import httpx
 import streamlit as st
+from dotenv import load_dotenv
 
+load_dotenv()
 URL_API = os.getenv("URL_API", "http://127.0.0.1:8000")
+CLAVE_API = os.getenv("CLAVE_API", "")
 
 st.set_page_config(page_title="Extractor de facturas", page_icon="🧾")
 st.title("Extractor de facturas")
@@ -16,6 +19,7 @@ if archivo is not None:
         try:
             respuesta = httpx.post(
                 f"{URL_API}/extraer",
+                headers={"X-API-Key": CLAVE_API},
                 files={"archivo": (archivo.name, archivo.getvalue(), "application/pdf")},
                 timeout=60,
             )
@@ -46,10 +50,10 @@ if archivo is not None:
 
     if factura["desglose_iva"]:
         st.subheader("Desglose de IVA")
-        
+
         def fmt(valor):
             return "-" if valor is None else f"{valor:g}"
-        
+
         filas = ["| Base | IVA % | Cuota |", "|---:|---:|---:|"]
         for linea in factura["desglose_iva"]:
             filas.append(f"| {fmt(linea['base'])} | {fmt(linea['porcentaje'])} | {fmt(linea['cuota'])} |")
