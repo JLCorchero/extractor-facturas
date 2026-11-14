@@ -7,7 +7,6 @@ from extraer_texto import extraer_texto
 from modelos import Factura
 
 load_dotenv()
-client = anthropic.Anthropic()
 MODELO = "claude-haiku-5-5"
 
 INSTRUCCIONES = """Extrae los datos de la factura que te paso.
@@ -29,9 +28,19 @@ Qué dato elegir cuando hay varios candidatos:
 - total: el importe total a pagar, con impuestos incluidos.
 - desglose_iva: una entrada por cada tipo de IVA con su base, su porcentaje y su cuota. Si solo hay un tipo, una sola entrada."""
 
+_cliente = None
 
-def extraer_factura(texto: str) -> tuple:
-    respuesta = client.messages.create(
+def obtener_cliente():
+    """Crea el cliente de Anthropic la primera vez que se necesita, no al importar el módulo."""
+    global _cliente
+    if _cliente is None:
+        _cliente = anthropic.Anthropic()
+    return _cliente
+
+
+def extraer_factura(texto: str, cliente=None) -> tuple:
+    cliente = cliente or obtener_cliente()
+    respuesta = cliente.messages.create(
         model=MODELO,
         max_tokens=1000,
         system=INSTRUCCIONES,

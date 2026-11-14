@@ -2,6 +2,7 @@ import sys
 
 from pypdf import PdfReader
 
+
 def extraer_texto(ruta: str) -> str:
     lector = PdfReader(ruta)
     paginas = [

@@ -46,7 +46,7 @@ def desglose_igual(esperado, obtenido) -> bool:
         coincide("num", x.porcentaje, y.porcentaje)
         and coincide("num", x.base, y.base)
         and coincide("num", x.cuota, y.cuota)
-        for x, y in zip(a, b)
+        for x, y in zip(a, b, strict=True)
     )
 
 
