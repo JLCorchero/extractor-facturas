@@ -1,0 +1,4 @@
+pytest
+ruff
+faker
+fpdf2
