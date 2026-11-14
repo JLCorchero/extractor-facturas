@@ -1,0 +1,15 @@
+36 facturas de datos/respuestas.json
+Falsas alarmas sobre las respuestas correctas: 0 de 36
+
+Error inyectado                                          casos  detectados
+total con una cifra cambiada                                36         92%
+base_imponible = base de la 1.ª línea (regresión real)      12        100%
+iva_total = cuota de la 1.ª línea                           12        100%
+falta una línea del desglose                                12        100%
+total = base (olvida el IVA)                                36        100%
+emisor_nif vacío                                            36        100%
+cliente_nif con una cifra cambiada                          27        100%
+cliente_nif vacío (fallo real de la v1)                     27          0%
+numero_factura con una cifra cambiada                       36          0%
+fecha un día después                                        36          0%
+emisor_nombre incompleto                                    36          0%
